@@ -10,9 +10,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class RNCWebViewPackage implements ReactPackage {
+  
+  RNCWebViewManager viewManager;
+  
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-    return Collections.singletonList(new RNCWebViewModule(reactContext));
+    RNCWebViewModule webViewModule = new RNCWebViewModule(reactContext);
+    webViewModule.setWebViewPackage(this);
+    return Collections.singletonList(webViewModule);
   }
 
   // Deprecated from RN 0.47
@@ -22,6 +27,11 @@ public class RNCWebViewPackage implements ReactPackage {
 
   @Override
   public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-    return Collections.singletonList(new RNCWebViewManager());
+    viewManager = new RNCWebViewManager();
+    return Collections.singletonList(viewManager);
+  }
+  
+  public RNCWebViewManager getViewManager() {
+    return viewManager;
   }
 }

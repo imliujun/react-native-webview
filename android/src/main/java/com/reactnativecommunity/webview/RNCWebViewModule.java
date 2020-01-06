@@ -25,6 +25,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
@@ -32,6 +33,7 @@ import com.facebook.react.modules.core.PermissionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -65,7 +67,17 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
       return false;
     }
   };
-
+  
+  RNCWebViewPackage webViewPackage;
+  
+  public void setWebViewPackage(RNCWebViewPackage webViewPackage) {
+    this.webViewPackage = webViewPackage;
+  }
+  
+  public RNCWebViewPackage getWebViewPackage() {
+    return webViewPackage;
+  }
+  
   public RNCWebViewModule(ReactApplicationContext reactContext) {
     super(reactContext);
     reactContext.addActivityEventListener(this);
@@ -74,6 +86,34 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule implements Acti
   @Override
   public String getName() {
     return MODULE_NAME;
+  }
+  
+  @ReactMethod
+  public void setHeaders(ReadableMap headers) {
+    if (headers == null) {
+      return;
+    }
+    RNCWebViewPackage webViewPackage = getWebViewPackage();
+    if (webViewPackage == null) {
+      return;
+    }
+    try {
+      HashMap<String, Object> map = headers.toHashMap();
+      if (map == null || map.isEmpty()) {
+        return;
+      }
+      HashMap<String, String> header = new HashMap<>(map.size());
+      for (String key : map.keySet()) {
+        Object value = map.get(key);
+        if (value != null) {
+          header.put(key, value.toString());
+        }
+      }
+      
+      webViewPackage.getViewManager().setHeaders(header);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @ReactMethod
