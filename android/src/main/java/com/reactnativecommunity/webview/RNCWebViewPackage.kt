@@ -4,12 +4,15 @@ import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext
 
 
-class RNCWebViewPackage: ReactPackage {
+class RNCWebViewPackage : ReactPackage {
+  var viewManager: RNCWebViewManager? = null
+
   override fun createNativeModules(reactContext: ReactApplicationContext) = listOf(
-    RNCWebViewModule(reactContext)
+    RNCWebViewModule(reactContext).apply { setWebViewPackage(this@RNCWebViewPackage) }
   )
 
   override fun createViewManagers(reactContext: ReactApplicationContext) = listOf(
-    RNCWebViewManager()
+    RNCWebViewManager().apply { viewManager = this }
   )
+
 }

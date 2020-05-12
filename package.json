@@ -9,7 +9,7 @@
   ],
   "license": "MIT",
   "version": "9.4.0",
-  "homepage": "https://github.com/react-native-community/react-native-webview#readme",
+  "homepage": "https://github.com/imliujun/react-native-webview#readme",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start:android": "react-native run-android --root example/",
@@ -71,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-community/react-native-webview.git"
+    "url": "https://github.com/imliujun/react-native-webview.git"
   },
   "files": [
     "android",

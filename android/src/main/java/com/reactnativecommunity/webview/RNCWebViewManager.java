@@ -135,6 +135,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   protected WebViewConfig mWebViewConfig;
 
   protected RNCWebChromeClient mWebChromeClient = null;
+  protected RNCWebViewClient mRNCWebViewClient = null;
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
@@ -235,6 +236,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     });
 
     return webView;
+  }
+
+  public void setHeaders(Map<String, String> headers) {
+    if (mRNCWebViewClient != null) {
+      mRNCWebViewClient.setHeaders(headers);
+    }
   }
 
   @ReactProp(name = "javaScriptEnabled")
@@ -405,7 +412,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   public void setMessagingModuleName(WebView view, String moduleName) {
     ((RNCWebView) view).setMessagingModuleName(moduleName);
   }
-   
+
   @ReactProp(name = "incognito")
   public void setIncognito(WebView view, boolean enabled) {
     // Remove all previous cookies
@@ -541,7 +548,8 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
-    view.setWebViewClient(new RNCWebViewClient());
+    mRNCWebViewClient = new RNCWebViewClient();
+    view.setWebViewClient(mRNCWebViewClient);
   }
 
   @Override
@@ -641,6 +649,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     super.onDropViewInstance(webView);
     ((ThemedReactContext) webView.getContext()).removeLifecycleEventListener((RNCWebView) webView);
     ((RNCWebView) webView).cleanupCallbacksAndDestroy();
+    mRNCWebViewClient = null;
   }
 
   public static RNCWebViewModule getModule(ReactContext reactContext) {
@@ -729,6 +738,13 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       ignoreErrFailedForThisURL = url;
     }
 
+
+    private Map<String, String> headers;
+
+    public void setHeaders(Map<String, String> headers) {
+      this.headers = headers;
+    }
+
     @Override
     public void onPageFinished(WebView webView, String url) {
       super.onPageFinished(webView, url);
@@ -757,6 +773,12 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
       activeUrl = url;
+      if (url.startsWith("http://") || url.startsWith("https://")) {
+        if (headers != null && !headers.isEmpty()) {
+          view.loadUrl(url, headers);
+          return true;
+        }
+      }
       dispatchEvent(
         view,
         new TopShouldStartLoadWithRequestEvent(
