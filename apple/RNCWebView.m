@@ -925,7 +925,6 @@ static NSDictionary* customCertificatesForHost;
   if ([request.URL.absoluteString hasPrefix: @"alipay"]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSString *absoluteString = request.URL.absoluteString;
-            absoluteString = [absoluteString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
             if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:absoluteString]]) {
                           [[UIApplication sharedApplication] openURL:[NSURL URLWithString:absoluteString]];
             }
